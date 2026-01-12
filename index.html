@@ -1,137 +1,523 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nexus Search</title>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="page-title">NexusSearch | NoppoStudio</title>
+    
+    <!-- External Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              display: ['Space Grotesk', 'sans-serif'],
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-out forwards',
-              'slide-up': 'slideUp 0.5s ease-out forwards',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              slideUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-            },
-            colors: {
-              nexus: {
-                50: '#f9fafb',
-                100: '#f3f4f6',
-                200: '#e5e7eb',
-                300: '#d1d5db',
-                400: '#9ca3af',
-                500: '#6b7280',
-                600: '#4b5563',
-                700: '#374151',
-                800: '#1f2937',
-                900: '#111827',
-                black: '#0f0f0f',
-              }
-            }
-          },
-        },
-      }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
-      body {
-        background-color: #ffffff;
-        color: #0f0f0f;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      
-      /* Custom Selection Color */
-      ::selection {
-        background: #000;
-        color: #fff;
-      }
+        :root {
+            --noppo-primary: #2563eb;
+            --noppo-bg: #f8fafc;
+            --noppo-card-bg: #ffffff;
+            --noppo-text-main: #1e293b;
+            --noppo-text-sub: #64748b;
+            --noppo-border: #e2e8f0;
+            --font-main: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+        }
 
-      /* Hide Scrollbar for Chrome/Safari/Opera */
-      ::-webkit-scrollbar {
-        display: none;
-      }
-      /* Hide Scrollbar for IE, Edge and Firefox */
-      body {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-      }
-      
-      .markdown-body {
-        font-family: 'Inter', sans-serif;
-        font-weight: 300;
-        letter-spacing: -0.01em;
-      }
-      .markdown-body p {
-        margin-bottom: 1.25rem;
-        line-height: 1.7;
-        color: #374151;
-        font-size: 1.05rem;
-      }
-      .markdown-body strong {
-        font-weight: 600;
-        color: #000;
-      }
-      .markdown-body h1, .markdown-body h2 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 600;
-        letter-spacing: -0.03em;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        color: #000;
-      }
-      .markdown-body ul {
-        padding-left: 0;
-        list-style: none;
-        margin-bottom: 1.5rem;
-      }
-      .markdown-body li {
-        position: relative;
-        padding-left: 1.5rem;
-        margin-bottom: 0.5rem;
-        color: #374151;
-      }
-      .markdown-body li::before {
-        content: "—";
-        position: absolute;
-        left: 0;
-        color: #9ca3af;
-      }
+        body {
+            background-color: var(--noppo-bg);
+            font-family: var(--font-main);
+            color: var(--noppo-text-main);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Header */
+        .noppo-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--noppo-border);
+        }
+
+        /* Filter Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+        }
+        .tab-item {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--noppo-text-sub);
+            cursor: pointer;
+            border-radius: 99px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .tab-item:hover {
+            background: #f1f5f9;
+            color: var(--noppo-text-main);
+        }
+        .tab-item.active {
+            background: var(--noppo-primary);
+            color: #ffffff;
+        }
+
+        /* Search Results - Flat Cards */
+        .result-card {
+            background: var(--noppo-card-bg);
+            border: 1px solid var(--noppo-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .favicon-box {
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border: 1px solid var(--noppo-border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+        .result-title {
+            color: var(--noppo-primary);
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            padding-right: 32px;
+            display: block;
+        }
+        .result-title:hover { text-decoration: underline; }
+        .result-snippet {
+            color: var(--noppo-text-sub);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+
+        /* Clip Button */
+        .clip-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px;
+            border-radius: 8px;
+            color: var(--noppo-text-sub);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .clip-btn:hover {
+            background: #f1f5f9;
+            color: var(--noppo-primary);
+        }
+        .clip-btn.active {
+            color: var(--noppo-primary);
+            fill: var(--noppo-primary);
+        }
+
+        /* Search Bar */
+        .search-field {
+            background: white;
+            border: 2px solid var(--noppo-border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        .search-field:focus-within {
+            border-color: var(--noppo-primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Clip Drawer */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .drawer-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .drawer-content {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            z-index: 101;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .drawer-content.open {
+            right: 0;
+        }
+
+        /* Badge for Clip Count */
+        #clip-count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
     </style>
-
-<link rel="stylesheet" href="/index.css">
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
-    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0"
-  }
-}
-</script>
-  <script type="module" crossorigin src="/assets/index-D2ZugLFW.js"></script>
 </head>
-  <body>
-    <div id="root"></div>
+<body>
+
+    <!-- Header -->
+    <header id="main-header" class="fixed top-0 w-full z-50 noppo-header">
+        <div class="max-w-[1000px] mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4 cursor-pointer" onclick="resetPage()">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                    <i data-lucide="search" class="text-white w-5 h-5"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-slate-800">NexusSearch</span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button onclick="toggleDrawer()" class="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition">
+                    <i data-lucide="paperclip" class="w-5 h-5"></i>
+                    <span id="clip-count-badge" class="hidden">0</span>
+                </button>
+                <div id="auth-area"></div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div id="tab-container" class="hidden max-w-[1000px] mx-auto px-6 border-t border-slate-100">
+            <div class="tab-bar">
+                <div class="tab-item active" onclick="setSearchType('all')"><i data-lucide="layout" class="w-4 h-4"></i>すべて</div>
+                <div class="tab-item" onclick="setSearchType('image')"><i data-lucide="image" class="w-4 h-4"></i>画像</div>
+                <div class="tab-item" onclick="setSearchType('video')"><i data-lucide="play-circle" class="w-4 h-4"></i>動画</div>
+                <div class="tab-item" onclick="setSearchType('news')"><i data-lucide="rss" class="w-4 h-4"></i>ニュース</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Clip Drawer -->
+    <div id="drawer-overlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div id="drawer-content" class="drawer-content">
+        <div class="p-6 border-bottom flex items-center justify-between">
+            <h2 class="text-lg font-bold flex items-center gap-2">
+                <i data-lucide="paperclip" class="w-5 h-5 text-blue-600"></i>
+                クリップ済み
+            </h2>
+            <button onclick="toggleDrawer()" class="p-2 hover:bg-slate-100 rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div id="clip-list" class="flex-grow overflow-y-auto p-4 space-y-3">
+            <!-- Clipped items will be here -->
+            <div class="text-center py-10 text-slate-400 text-sm">クリップされた項目はありません</div>
+        </div>
+        <div class="p-6 border-t bg-slate-50">
+            <button onclick="clearAllClips()" class="w-full py-3 text-sm font-bold text-slate-500 hover:text-red-500 transition">
+                すべて解除
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Section -->
+    <main id="main-view" class="pt-32 pb-20 px-6 flex flex-col items-center min-h-screen">
+        
+        <!-- Hero -->
+        <div id="hero-section" class="text-center mt-12 mb-12">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold mb-6 border border-blue-100">
+                <i data-lucide="shield-check" class="w-3 h-3"></i>
+                NO-LOG SEARCH ENGINE
+            </div>
+            <h1 class="text-6xl sm:text-7xl font-bold tracking-tighter text-slate-800 mb-4">Nexus</h1>
+        </div>
+
+        <!-- Search Bar -->
+        <div id="search-box-container" class="w-full max-w-[720px] mb-8">
+            <div class="search-field relative flex items-center">
+                <div class="pl-5 text-slate-400">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </div>
+                <input type="text" id="search-input" autocomplete="off"
+                    class="w-full pl-4 pr-20 py-4 bg-transparent outline-none text-lg font-medium"
+                    placeholder="何をお探しですか？" onkeypress="handleKeyPress(event)">
+                
+                <div class="absolute right-4 flex items-center gap-2">
+                    <button id="clear-btn" onclick="clearSearch()" class="hidden p-2 text-slate-300 hover:text-slate-500">
+                        <i data-lucide="circle-x" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="performSearch(null, 1)" class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 transition">
+                        <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Content -->
+        <div id="results-view" class="hidden w-full max-w-[720px] mt-4 flex flex-col">
+            <div id="result-stats" class="text-xs text-slate-400 mb-6 font-bold uppercase tracking-widest"></div>
+            
+            <div id="results-list" class="space-y-4 pb-20">
+                <!-- Results -->
+            </div>
+
+            <div id="pagination-container" class="hidden py-8">
+                <button id="load-more-btn" onclick="loadNextPage()" class="w-full py-4 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition shadow-sm flex items-center justify-center gap-2">
+                    結果をさらに読み込む
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const AUTH_WORKER_URL = "https://noppo-auth.noppo5319.workers.dev";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXZhc3JkeGd1cWtpaWdjeGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0MTk5ODcsImV4cCI6MjA4Mjk5NTk4N30.CVq3lyRbxek7Ejs4tP5sN9-0JNEXSLtCsC2Pj-skFFQ";
+        const SEARCH_API_KEY = "AIzaSyDW602QBfxHdwKSMVyoEXEYjlS0C-l1Ar8";
+        const SEARCH_ENGINE_ID = "970989a8b40d0486c";
+
+        let currentUser = null;
+        let currentStartIndex = 1;
+        let isSearching = false;
+        let searchType = 'all';
+        let clippedItems = [];
+
+        // --- Auth ---
+        async function loadUser() {
+            const params = new URLSearchParams(window.location.search);
+            const ticket = params.get('ticket');
+            try {
+                const url = ticket ? `${AUTH_WORKER_URL}/auth/v1/user?ticket=${ticket}` : `${AUTH_WORKER_URL}/auth/v1/user`;
+                const res = await fetch(url, { headers: { "apikey": SUPABASE_KEY }, credentials: "include" });
+                if (res.ok) {
+                    const user = await res.json();
+                    if (ticket) {
+                        const cleanUrl = new URL(window.location.href);
+                        cleanUrl.searchParams.delete('ticket');
+                        window.history.replaceState({}, document.title, cleanUrl.toString());
+                    }
+                    return { name: user.user_metadata.display_name, avatar: user.user_metadata.avatar_url };
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function updateAuthUI() {
+            const area = document.getElementById('auth-area');
+            if (currentUser) {
+                area.innerHTML = `<img src="${currentUser.avatar}" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm cursor-pointer" onclick="logout()" title="${currentUser.name}">`;
+            } else {
+                area.innerHTML = `<button onclick="goToLogin()" class="text-sm font-bold text-slate-500 hover:text-blue-600 transition">ログイン</button>`;
+            }
+            lucide.createIcons();
+        }
+
+        function goToLogin() { window.location.href = `${AUTH_WORKER_URL}?redirect=${encodeURIComponent(window.location.href)}`; }
+        function logout() { window.location.href = `${AUTH_WORKER_URL}/logout?redirect=${encodeURIComponent(window.location.origin + window.location.pathname)}`; }
+
+        // --- Clip Functionality ---
+        function toggleClip(title, link, host) {
+            const index = clippedItems.findIndex(i => i.link === link);
+            if (index > -1) {
+                clippedItems.splice(index, 1);
+            } else {
+                clippedItems.push({ title, link, host });
+            }
+            updateClipUI();
+        }
+
+        function updateClipUI() {
+            const badge = document.getElementById('clip-count-badge');
+            const clipList = document.getElementById('clip-list');
+            
+            // Update Badge
+            if (clippedItems.length > 0) {
+                badge.innerText = clippedItems.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            // Update Result Buttons
+            document.querySelectorAll('.clip-btn').forEach(btn => {
+                const link = btn.getAttribute('data-link');
+                const isActive = clippedItems.some(i => i.link === link);
+                btn.classList.toggle('active', isActive);
+            });
+
+            // Update Drawer List
+            if (clippedItems.length === 0) {
+                clipList.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm">クリップされた項目はありません</div>`;
+            } else {
+                clipList.innerHTML = clippedItems.map(item => `
+                    <div class="p-4 bg-white border border-slate-100 rounded-xl hover:border-blue-200 transition group relative">
+                        <div class="flex items-center gap-2 mb-1">
+                            <img src="https://www.google.com/s2/favicons?domain=${item.host}&sz=32" class="w-3 h-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">${item.host}</span>
+                        </div>
+                        <a href="${item.link}" target="_blank" class="text-sm font-semibold text-slate-800 hover:text-blue-600 line-clamp-1 pr-6">${item.title}</a>
+                        <button onclick="toggleClip('${item.title}', '${item.link}', '${item.host}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function toggleDrawer() {
+            document.getElementById('drawer-overlay').classList.toggle('open');
+            document.getElementById('drawer-content').classList.toggle('open');
+        }
+
+        function clearAllClips() {
+            clippedItems = [];
+            updateClipUI();
+        }
+
+        // --- Core ---
+        function handleKeyPress(e) { if (e.key === 'Enter') performSearch(null, 1); }
+        function clearSearch() { document.getElementById('search-input').value = ''; document.getElementById('clear-btn').classList.add('hidden'); }
+        function resetPage() { window.location.href = window.location.origin + window.location.pathname; }
+
+        function setSearchType(type) {
+            searchType = type;
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            const idx = ['all', 'image', 'video', 'news'].indexOf(type);
+            document.querySelectorAll('.tab-item')[idx].classList.add('active');
+            performSearch(null, 1);
+        }
+
+        async function performSearch(queryFromUrl = null, startIndex = 1) {
+            if (isSearching) return;
+            const input = document.getElementById('search-input');
+            const query = (queryFromUrl || input.value).trim();
+            if (!query) return;
+
+            isSearching = true;
+            currentStartIndex = startIndex;
+            document.title = `${query} - NexusSearch`;
+            document.getElementById('clear-btn').classList.remove('hidden');
+
+            document.getElementById('hero-section').classList.add('hidden');
+            document.getElementById('tab-container').classList.remove('hidden');
+            document.getElementById('results-view').classList.remove('hidden');
+            document.getElementById('main-view').classList.replace('pt-32', 'pt-48');
+            
+            const list = document.getElementById('results-list');
+            if (startIndex === 1) {
+                list.innerHTML = `<div class="space-y-4">${[1,2,3].map(() => `<div class="h-32 bg-white border border-slate-100 rounded-2xl animate-pulse"></div>`).join('')}</div>`;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            let url = `https://www.googleapis.com/customsearch/v1?key=${SEARCH_API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(query)}&start=${startIndex}&hl=ja&lr=lang_ja`;
+            if (searchType === 'image') url += '&searchType=image';
+            else if (searchType === 'video') url += '&q=' + encodeURIComponent(query + ' video');
+            else if (searchType === 'news') url += '&q=' + encodeURIComponent(query + ' news');
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (startIndex === 1) list.innerHTML = '';
+
+                if (data.items) {
+                    document.getElementById('result-stats').innerText = `${data.searchInformation.formattedTotalResults} 件の見つかった結果`;
+                    renderResults(data.items, startIndex !== 1);
+                    document.getElementById('pagination-container').classList.toggle('hidden', !data.queries.nextPage);
+                } else if (startIndex === 1) {
+                    list.innerHTML = `<div class="text-center py-20 text-slate-400">結果が見つかりませんでした。</div>`;
+                }
+            } catch (e) {
+                list.innerHTML = `<div class="text-center py-20 text-red-400 font-bold">検索中にエラーが発生しました。</div>`;
+            }
+            isSearching = false;
+            lucide.createIcons();
+        }
+
+        function renderResults(items, append = false) {
+            const list = document.getElementById('results-list');
+            let html = '';
+
+            if (searchType === 'image') {
+                html = `<div class="image-grid">` + items.map(item => `
+                    <div class="img-item animate-fade group relative">
+                        <a href="${item.image.contextLink}" target="_blank">
+                            <img src="${item.link}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
+                        </a>
+                        <button onclick="toggleClip('${item.title.replace(/'/g, "\\'")}', '${item.link}', '${new URL(item.image.contextLink).hostname}')" 
+                                class="clip-btn absolute bottom-2 right-2 bg-white/90 backdrop-blur shadow-md !top-auto" data-link="${item.link}">
+                            <i data-lucide="paperclip" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `).join('') + `</div>`;
+            } else {
+                html = items.map(item => {
+                    const host = new URL(item.link).hostname;
+                    const isActive = clippedItems.some(i => i.link === item.link);
+                    return `
+                    <div class="result-card animate-fade">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="favicon-box">
+                                <img src="https://www.google.com/s2/favicons?domain=${host}&sz=64" class="w-full h-full">
+                            </div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-tight">${host}</span>
+                        </div>
+                        <a href="${item.link}" target="_blank" class="result-title">${item.title}</a>
+                        <p class="result-snippet">${item.snippet}</p>
+                        <button onclick="toggleClip('${item.title.replace(/'/g, "\\'")}', '${item.link}', '${host}')" 
+                                class="clip-btn ${isActive ? 'active' : ''}" data-link="${item.link}">
+                            <i data-lucide="paperclip" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    `;
+                }).join('');
+            }
+
+            if (append) list.insertAdjacentHTML('beforeend', html);
+            else list.innerHTML = html;
+            
+            updateClipUI();
+        }
+
+        function loadNextPage() {
+            currentStartIndex += 10;
+            performSearch(null, currentStartIndex);
+        }
+
+        window.onload = async () => {
+            currentUser = await loadUser();
+            updateAuthUI();
+            const q = new URLSearchParams(window.location.search).get('q');
+            if (q) {
+                document.getElementById('search-input').value = q;
+                performSearch(q, 1);
+            }
+        };
+    </script>
 </body>
 </html>
